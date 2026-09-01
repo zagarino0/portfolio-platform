@@ -1,5 +1,6 @@
 import cors from "@fastify/cors";
 import Fastify from "fastify";
+import { githubRoutes } from "./modules/github/github.routes.js";
 import { projectRoutes } from "./modules/projects/project.routes.js";
 
 export function buildApp() {
@@ -15,6 +16,7 @@ export function buildApp() {
   }));
 
   app.register(projectRoutes);
+  app.register(githubRoutes);
 
   return app;
 }
