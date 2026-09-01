@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProjectStatus {
+  IN_PROGRESS
+  COMPLETED
+  PRODUCTION
+  ARCHIVED
+}
+
+enum ProjectType {
+  WEBSITE
+  WEB_APP
+  MOBILE
+  BACKEND
+  OTHER
+}
+
+model Project {
+  id                String        @id @default(cuid())
+  slug              String        @unique
+  title             String
+  category          String
+  description       String
+  role              String
+  type              ProjectType
+  status            ProjectStatus  @default(IN_PROGRESS)
+  problem           String
+  solution          String
+  results           String[]
+  technologies      String[]
+  image             String?
+  liveUrl           String?
+  githubUrl         String?
+  githubOwner       String?
+  githubRepository  String?
+  githubBranch      String?
+  featured          Boolean       @default(false)
+  published         Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([published])
+  @@index([featured])
+  @@index([status])
+}
