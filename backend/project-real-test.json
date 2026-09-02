@@ -1,0 +1,21 @@
+﻿{
+  "slug": "portfolio-platform-real-test-2026",
+  "title": "Portfolio Platform Real Test",
+  "category": "Web Development",
+  "description": "Test réel de création en base PostgreSQL",
+  "role": "Full Stack Developer",
+  "type": "WEBSITE",
+  "status": "PRODUCTION",
+  "problem": "Test",
+  "solution": "Test",
+  "results": ["Test réussi"],
+  "technologies": ["React", "TypeScript", "Node.js"],
+  "image": null,
+  "liveUrl": null,
+  "githubUrl": "https://github.com/zagarino0/portfolio-platform",
+  "githubOwner": "zagarino0",
+  "githubRepository": "portfolio-platform",
+  "githubBranch": "main",
+  "featured": false,
+  "published": false
+}

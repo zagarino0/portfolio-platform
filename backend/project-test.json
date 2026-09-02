@@ -1,0 +1,21 @@
+﻿{
+  "slug": "portfolio-platform-20260902-test",
+  "title": "Portfolio Platform Test 2026",
+  "category": "Web Development",
+  "description": "Test de création de projet",
+  "role": "Full Stack Developer",
+  "type": "WEBSITE",
+  "status": "PRODUCTION",
+  "problem": "Test",
+  "solution": "Test",
+  "results": ["Test"],
+  "technologies": ["React", "TypeScript", "Node.js"],
+  "image": null,
+  "liveUrl": null,
+  "githubUrl": "https://github.com/zagarino0/portfolio-platform",
+  "githubOwner": "zagarino0",
+  "githubRepository": "portfolio-platform",
+  "githubBranch": "main",
+  "featured": false,
+  "published": false
+}
