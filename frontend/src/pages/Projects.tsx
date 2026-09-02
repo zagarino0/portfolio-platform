@@ -1,19 +1,18 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
   getPublishedProjects,
   type Project,
-} from "../../services/projects";
+} from "../services/projects";
 
-export function Projects() {
+export function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    let active = true;
+    let mounted = true;
 
     async function loadProjects() {
       try {
@@ -22,13 +21,13 @@ export function Projects() {
 
         const data = await getPublishedProjects();
 
-        if (active) {
+        if (mounted) {
           setProjects(data);
         }
       } catch (err) {
-        console.error("PROJECTS LOAD ERROR:", err);
+        console.error("PROJECTS PAGE ERROR:", err);
 
-        if (active) {
+        if (mounted) {
           setError(
             err instanceof Error
               ? err.message
@@ -36,7 +35,7 @@ export function Projects() {
           );
         }
       } finally {
-        if (active) {
+        if (mounted) {
           setLoading(false);
         }
       }
@@ -45,26 +44,30 @@ export function Projects() {
     loadProjects();
 
     return () => {
-      active = false;
+      mounted = false;
     };
   }, []);
 
   return (
-    <section id="projets" className="section projects-section">
+    <main className="section projects-page">
       <div className="container">
-        <div className="section-heading">
-          <span className="eyebrow">02 / 06 · Projets</span>
+        <header className="section-heading">
+          <span className="eyebrow">
+            01 / Projets
+          </span>
 
-          <h2>
-            Des produits construits pour résoudre
-            de vrais problèmes.
-          </h2>
+          <h1>
+            Tous les projets
+            <br />
+            publiés.
+          </h1>
 
           <p>
-            Une sélection de projets conçus, développés et
-            déployés avec une approche orientée produit.
+            Une sélection de produits numériques conçus,
+            développés et déployés avec une approche orientée
+            produit.
           </p>
-        </div>
+        </header>
 
         {loading && (
           <div className="projects-grid">
@@ -88,13 +91,15 @@ export function Projects() {
           <div className="projects-grid">
             <div className="project-card">
               <span className="eyebrow">Portfolio</span>
-              <p>Aucun projet publié pour le moment.</p>
+              <p>
+                Aucun projet publié pour le moment.
+              </p>
             </div>
           </div>
         )}
 
         {!loading && !error && projects.length > 0 && (
-          <div className="projects-grid">
+          <div className="projects-grid projects-page__grid">
             {projects.map((project) => (
               <article
                 key={project.id}
@@ -104,43 +109,37 @@ export function Projects() {
                     : ""
                 }`}
               >
-                
-<div className="project-card__top">
-  <div className="project-card__badges">
-    <span className="project-card__badge">
-      {project.category}
-    </span>
+                <div className="project-card__top">
+                  <div className="project-card__badges">
+                    <span className="project-card__badge">
+                      {project.category}
+                    </span>
 
-    {project.featured && (
-      <span className="project-card__badge project-card__badge--featured">
-        Featured
-      </span>
-    )}
-  </div>
-</div>
- 
+                    {project.featured && (
+                      <span className="project-card__badge project-card__badge--featured">
+                        Featured
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-{project.image && (
-  <div className="project-card__image">
-    <img
-      src={project.image}
-      alt=""
-      loading="lazy"
-    />
-  </div>
-)}
+                {project.image && (
+                  <div className="project-card__image">
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
 
-<div className="project-card__content">
-  <h3>{project.title}</h3>
+                <div className="project-card__content">
+                  <h2>{project.title}</h2>
 
-  {project.description && (
-    <p>{project.description}</p>
-  )}
-</div>
-
-
-
-        
+                  {project.description && (
+                    <p>{project.description}</p>
+                  )}
+                </div>
 
                 {project.technologies?.length > 0 && (
                   <div className="project-card__technologies">
@@ -157,7 +156,6 @@ export function Projects() {
                 <Link
                   className="project-card__link"
                   to={`/projets/${project.slug}`}
-                  aria-label={`Voir le projet ${project.title}`}
                 >
                   Voir le projet
                   <span aria-hidden="true">→</span>
@@ -167,7 +165,6 @@ export function Projects() {
           </div>
         )}
       </div>
-    </section>
+    </main>
   );
 }
-
