@@ -1,6 +1,15 @@
 import type { GithubImportResult } from "./github.types.js";
 
 const GITHUB_API = "https://api.github.com";
+const GITHUB_REPOSITORY = "zagarino0/portfolio-platform";
+const PROJECTS_PATH = "frontend/public/projects";
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Map([
+  ["image/jpeg", "jpg"],
+  ["image/png", "png"],
+  ["image/webp", "webp"],
+  ["image/gif", "gif"],
+]);
 
 type GithubRepository = {
   name: string;
@@ -59,6 +68,95 @@ async function fetchReadme(owner: string, repository: string) {
   });
   if (!response.ok) return "";
   return response.text();
+}
+
+function sanitizeFileName(value: string): string {
+  const baseName = value.trim().replace(/\\/g, "/").split("/").pop() ?? "";
+  const sanitized = baseName
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Za-z0-9._-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^[-.]+|[-.]+$/g, "");
+
+  if (!sanitized || sanitized === "." || sanitized === "..") {
+    throw new Error("Invalid image filename");
+  }
+
+  return sanitized;
+}
+
+function validateImageType(contentType: string, fileName: string): string {
+  const normalizedType = contentType.split(";", 1)[0].trim().toLowerCase();
+  const extension = ALLOWED_IMAGE_TYPES.get(normalizedType);
+
+  if (!extension) {
+    throw new Error("Unsupported image type. Allowed: JPEG, PNG, WebP, GIF");
+  }
+
+  const actualExtension = fileName.split(".").pop()?.toLowerCase();
+  if (actualExtension !== extension) {
+    throw new Error("Image extension does not match its content type");
+  }
+
+  return extension;
+}
+
+export async function uploadProjectImage(params: {
+  fileName: string;
+  contentType: string;
+  buffer: Buffer;
+}): Promise<{ path: string; url: string; commitSha: string }> {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) throw new Error("GITHUB_TOKEN is not configured");
+
+  if (!Buffer.isBuffer(params.buffer) || params.buffer.length === 0) {
+    throw new Error("Image file is empty");
+  }
+
+  if (params.buffer.length > MAX_IMAGE_SIZE) {
+    throw new Error("Image is too large. Maximum size is 5 MB");
+  }
+
+  const fileName = sanitizeFileName(params.fileName);
+  validateImageType(params.contentType, fileName);
+
+  const path = `${PROJECTS_PATH}/${fileName}`;
+  const content = params.buffer.toString("base64");
+
+  const response = await fetch(
+    `${GITHUB_API}/repos/${GITHUB_REPOSITORY}/contents/${path}`,
+    {
+      method: "PUT",
+      headers: {
+        ...githubHeaders(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: `feat: upload project image ${fileName}`,
+        content,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const error = new Error(`GitHub upload failed with status ${response.status}`) as GithubApiError;
+    error.status = response.status;
+    throw error;
+  }
+
+  const data = (await response.json()) as { commit?: { sha?: string } };
+  const commitSha = data.commit?.sha;
+
+  if (!commitSha) {
+    throw new Error("GitHub upload succeeded but no commit SHA was returned");
+  }
+
+  return {
+    path: `/${path}`,
+    url: `/${path}`,
+    commitSha,
+  };
 }
 
 export async function importGithubRepository(rawUrl: string): Promise<GithubImportResult> {
