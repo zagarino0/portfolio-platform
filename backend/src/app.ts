@@ -12,16 +12,16 @@ export function buildApp() {
   });
 
   app.register(cors, {
-    origin: true,
-    methods: [
-      "GET",
-      "POST",
-      "PATCH",
-      "PUT",
-      "DELETE",
-      "OPTIONS",
-    ],
-  });
+  origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
+  methods: [
+    "GET",
+    "POST",
+    "PATCH",
+    "PUT",
+    "DELETE",
+    "OPTIONS",
+  ],
+});
 
   app.get("/health", async () => ({
     status: "ok",
