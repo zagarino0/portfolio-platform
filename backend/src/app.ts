@@ -11,8 +11,22 @@ export function buildApp() {
     logger: true,
   });
 
-  app.register(cors, {
-  origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
+const allowedOrigins = (
+  process.env.CORS_ORIGIN ?? "http://localhost:5173"
+)
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.register(cors, {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error("Origin not allowed"), false);
+  },
   methods: [
     "GET",
     "POST",
