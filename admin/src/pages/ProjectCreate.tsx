@@ -77,10 +77,24 @@ const initialProject: Project = importState.importedProject
   ? {
       ...emptyProject,
       ...importState.importedProject,
+
+      role: importState.importedProject.role ?? "",
+      problem: importState.importedProject.problem ?? "",
+      solution: importState.importedProject.solution ?? "",
+      results: importState.importedProject.results ?? [],
+
       technologies:
         importState.importedProject.technologies?.length
           ? importState.importedProject.technologies
           : importState.github?.languages ?? [],
+
+      image: importState.importedProject.image ?? null,
+      liveUrl: importState.importedProject.liveUrl ?? null,
+      githubUrl: importState.importedProject.githubUrl ?? null,
+      githubOwner: importState.importedProject.githubOwner ?? null,
+      githubRepository:
+        importState.importedProject.githubRepository ?? null,
+      githubBranch: importState.importedProject.githubBranch ?? null,
     }
   : emptyProject;
 
@@ -198,12 +212,17 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     return;
   }
 
-  if (!form.description.trim()) {
-    setError("La description est obligatoire.");
-    return;
-  }
+if (!form.description.trim()) {
+  setError("La description est obligatoire.");
+  return;
+}
 
-  console.log("3. VALIDATION OK");
+if (!form.role.trim()) {
+  setError("Le rôle du projet est obligatoire.");
+  return;
+}
+
+console.log("3. VALIDATION OK");
 
   // Protection contre les doubles soumissions
   if (loading) {
@@ -361,7 +380,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
             </label>
 
             <label className="field">
-              <span>Rôle</span>
+            <span>Rôle *</span>
               <input
                 type="text"
                 value={form.role}
